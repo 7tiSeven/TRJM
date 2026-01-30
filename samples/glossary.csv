@@ -1,0 +1,32 @@
+source,target,case_sensitive,context
+quarterly report,التقرير الفصلي,false,business/finance
+annual report,التقرير السنوي,false,business/finance
+board of directors,مجلس الإدارة,false,corporate governance
+chief executive officer,الرئيس التنفيذي,false,corporate titles
+stakeholder,أصحاب المصلحة,false,business
+revenue,الإيرادات,false,finance
+profit margin,هامش الربح,false,finance
+customer satisfaction,رضا العملاء,false,business
+key performance indicator,مؤشر الأداء الرئيسي,false,business
+market share,الحصة السوقية,false,business
+supply chain,سلسلة التوريد,false,logistics
+due diligence,العناية الواجبة,false,legal/business
+memorandum of understanding,مذكرة تفاهم,false,legal
+terms and conditions,الشروط والأحكام,false,legal
+privacy policy,سياسة الخصوصية,false,legal/tech
+user agreement,اتفاقية المستخدم,false,legal/tech
+data protection,حماية البيانات,false,tech/legal
+cybersecurity,الأمن السيبراني,false,tech
+cloud computing,الحوسبة السحابية,false,tech
+artificial intelligence,الذكاء الاصطناعي,false,tech
+machine learning,تعلم الآلة,false,tech
+best practices,أفضل الممارسات,false,general
+action items,بنود العمل,false,meetings
+follow-up,المتابعة,false,general
+deadline,الموعد النهائي,false,general
+milestone,معلم رئيسي,false,project management
+deliverable,مخرج,false,project management
+workflow,سير العمل,false,business
+dashboard,لوحة المعلومات,false,tech
+login,تسجيل الدخول,false,tech
+logout,تسجيل الخروج,false,tech

@@ -1,0 +1,136 @@
+# =============================================================================
+# Translator Agent Prompt Template
+# =============================================================================
+# Performs the main translation with glossary and token protection
+# =============================================================================
+
+name: translator_agent
+version: "1.0"
+description: "Translates text while respecting glossary terms and protecting special tokens"
+
+system_prompt: |
+  You are an expert translator specializing in English-Arabic translation.
+  You produce high-quality, culturally appropriate translations.
+
+  CRITICAL RULES:
+  1. PROTECTED TOKENS: Never translate items marked as protected. Keep them exactly as provided.
+  2. GLOSSARY: Always use the provided glossary translations for specified terms.
+  3. PRESERVE FORMATTING: Maintain markdown, lists, paragraphs, and structure.
+  4. CULTURAL ADAPTATION: Adapt idioms and expressions appropriately for the target culture.
+  5. CONSISTENCY: Use consistent terminology throughout the translation.
+
+  For Arabic (ar) translations:
+  - Use Modern Standard Arabic (MSA) unless otherwise specified
+  - Apply proper Arabic punctuation (،  ؛  ؟)
+  - Ensure correct RTL text flow
+  - Handle mixed LTR/RTL content properly (numbers, Latin text)
+
+  Your response must be a valid JSON object with:
+  1. translation: The translated text
+  2. protected_tokens_preserved: List of protected tokens that were preserved
+  3. glossary_terms_applied: List of glossary terms that were applied
+  4. translator_notes: Any notes about translation decisions
+
+style_instructions:
+  formal_msa: |
+    Use formal Modern Standard Arabic (الفصحى). Maintain elevated register.
+    Avoid colloquialisms. Use formal pronouns and verb forms.
+    Suitable for official documents, academic texts, and formal correspondence.
+
+  neutral: |
+    Use clear, professional Modern Standard Arabic.
+    Balance formality with accessibility. Suitable for business communication.
+
+  marketing: |
+    Use engaging, persuasive Arabic. Adapt idioms for cultural relevance.
+    Maintain brand voice while ensuring natural Arabic flow.
+    May use slightly less formal register for accessibility.
+
+  government_memo: |
+    Use highly formal bureaucratic Arabic. Follow official terminology.
+    Use passive voice where appropriate. Maintain impersonal tone.
+    Reference official document conventions.
+
+user_prompt_template: |
+  Translate the following text from {source_language} to {target_language}.
+
+  STYLE: {style_preset}
+  {style_instructions}
+
+  PROTECTED TOKENS (DO NOT TRANSLATE - keep exactly as shown):
+  {protected_tokens}
+
+  GLOSSARY (USE THESE EXACT TRANSLATIONS):
+  {glossary_entries}
+
+  SOURCE TEXT:
+  ---
+  {input_text}
+  ---
+
+  Provide your translation as a JSON object.
+
+response_schema:
+  type: object
+  required:
+    - translation
+    - protected_tokens_preserved
+    - glossary_terms_applied
+  properties:
+    translation:
+      type: string
+      description: "The translated text"
+    protected_tokens_preserved:
+      type: array
+      items:
+        type: object
+        properties:
+          original:
+            type: string
+          preserved:
+            type: boolean
+    glossary_terms_applied:
+      type: array
+      items:
+        type: object
+        properties:
+          source_term:
+            type: string
+          applied_translation:
+            type: string
+          count:
+            type: integer
+    translator_notes:
+      type: string
+      description: "Optional notes about translation decisions"
+
+examples:
+  - input:
+      source_language: "en"
+      target_language: "ar"
+      style_preset: "formal_msa"
+      protected_tokens:
+        - "{user_name}"
+        - "support@company.com"
+      glossary_entries:
+        - source: "quarterly report"
+          target: "التقرير الفصلي"
+      input_text: |
+        Dear {user_name},
+
+        Please review the quarterly report attached. Contact support@company.com for assistance.
+    output:
+      translation: |
+        عزيزي {user_name}،
+
+        يرجى مراجعة التقرير الفصلي المرفق. للحصول على المساعدة، يرجى التواصل عبر support@company.com.
+      protected_tokens_preserved:
+        - original: "{user_name}"
+          preserved: true
+        - original: "support@company.com"
+          preserved: true
+      glossary_terms_applied:
+        - source_term: "quarterly report"
+          applied_translation: "التقرير الفصلي"
+          count: 1
+      translator_notes: "Maintained formal register. Adapted greeting structure for Arabic conventions."

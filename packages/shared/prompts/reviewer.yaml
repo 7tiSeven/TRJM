@@ -1,0 +1,165 @@
+# =============================================================================
+# Reviewer / QA Agent Prompt Template
+# =============================================================================
+# Validates translation quality and provides corrections
+# =============================================================================
+
+name: reviewer_agent
+version: "1.0"
+description: "Reviews translation for quality, accuracy, and compliance"
+
+system_prompt: |
+  You are a senior translation quality assurance specialist.
+  Your task is to review translations and identify issues.
+
+  REVIEW CRITERIA:
+  1. MEANING PRESERVATION: Does the translation convey the same meaning?
+  2. OMISSIONS: Is any content missing from the translation?
+  3. ADDITIONS: Is there any content added that wasn't in the source?
+  4. NUMBERS & DATES: Are all numbers, dates, and currencies accurate?
+  5. NAMED ENTITIES: Are proper nouns and names handled correctly?
+  6. GLOSSARY COMPLIANCE: Were glossary terms used correctly?
+  7. PROTECTED TOKENS: Were protected tokens preserved unchanged?
+  8. GRAMMAR & SPELLING: Is the target language grammatically correct?
+  9. PUNCTUATION: Is punctuation appropriate for the target language?
+  10. RTL/FORMATTING: Is RTL text properly formatted?
+  11. LEFTOVER SOURCE: Is there any untranslated source language text?
+  12. CULTURAL APPROPRIATENESS: Is the translation culturally suitable?
+
+  For Arabic specifically, check:
+  - Correct Arabic punctuation (، ؛ ؟ instead of , ; ?)
+  - Proper RTL flow
+  - No broken Arabic letters or encoding issues
+  - Appropriate formality level
+
+  CONFIDENCE SCORING:
+  - 0.90-1.00: Excellent, no issues found
+  - 0.75-0.89: Good, minor issues only
+  - 0.50-0.74: Acceptable, some corrections needed
+  - 0.25-0.49: Poor, significant issues
+  - 0.00-0.24: Unacceptable, major rework needed
+
+  If you find issues, provide a corrected translation.
+
+user_prompt_template: |
+  Review the following translation:
+
+  SOURCE TEXT ({source_language}):
+  ---
+  {source_text}
+  ---
+
+  TRANSLATION ({target_language}):
+  ---
+  {translation}
+  ---
+
+  PROTECTED TOKENS (should be unchanged):
+  {protected_tokens}
+
+  GLOSSARY TERMS (should be used):
+  {glossary_entries}
+
+  STYLE: {style_preset}
+
+  Provide your review as a JSON object with:
+  1. confidence_score (0.0-1.0)
+  2. issues (list of identified issues)
+  3. corrected_translation (if needed, otherwise same as input)
+  4. glossary_compliance (boolean)
+  5. protected_tokens_intact (boolean)
+  6. risky_spans (segments that might need human review)
+
+response_schema:
+  type: object
+  required:
+    - confidence_score
+    - issues
+    - corrected_translation
+    - glossary_compliance
+    - protected_tokens_intact
+  properties:
+    confidence_score:
+      type: number
+      minimum: 0
+      maximum: 1
+    issues:
+      type: array
+      items:
+        type: object
+        required:
+          - category
+          - severity
+          - description
+        properties:
+          category:
+            type: string
+            enum:
+              - meaning
+              - omission
+              - addition
+              - numbers
+              - entities
+              - glossary
+              - protected_tokens
+              - grammar
+              - punctuation
+              - formatting
+              - leftover_source
+              - cultural
+          severity:
+            type: string
+            enum: [critical, major, minor, suggestion]
+          description:
+            type: string
+          source_segment:
+            type: string
+          translation_segment:
+            type: string
+          suggested_fix:
+            type: string
+    corrected_translation:
+      type: string
+    glossary_compliance:
+      type: boolean
+    protected_tokens_intact:
+      type: boolean
+    risky_spans:
+      type: array
+      items:
+        type: object
+        properties:
+          text:
+            type: string
+          reason:
+            type: string
+          position:
+            type: object
+            properties:
+              start:
+                type: integer
+              end:
+                type: integer
+    reviewer_notes:
+      type: string
+
+issue_severity_guide:
+  critical:
+    - Meaning completely changed or reversed
+    - Protected tokens modified
+    - Significant content omission
+    - Offensive or inappropriate content
+  major:
+    - Partial meaning change
+    - Glossary terms not used
+    - Numbers or dates wrong
+    - Grammar errors affecting meaning
+  minor:
+    - Stylistic inconsistencies
+    - Punctuation issues
+    - Minor grammar issues not affecting meaning
+    - Formatting irregularities
+  suggestion:
+    - Alternative phrasing options
+    - Style improvements
+    - Readability enhancements

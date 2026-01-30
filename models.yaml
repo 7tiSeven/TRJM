@@ -1,0 +1,133 @@
+# =============================================================================
+# TRJM - Model Configuration
+# =============================================================================
+# This file defines supported LLM models and their configurations
+# =============================================================================
+
+# Phase 1: OpenAI Models
+openai:
+  gpt-4.1:
+    provider: openai
+    display_name: "GPT-4.1"
+    description: "OpenAI GPT-4.1 - Primary development model"
+    context_window: 128000
+    max_output_tokens: 16384
+    supports_json_mode: true
+    supports_vision: false
+    cost_per_1k_input: 0.01
+    cost_per_1k_output: 0.03
+    recommended_temperature:
+      translation: 0.3
+      review: 0.2
+      routing: 0.1
+    rate_limits:
+      requests_per_minute: 500
+      tokens_per_minute: 150000
+
+# Phase 2: vLLM Local Models
+vllm:
+  "Qwen/Qwen2.5-32B-Instruct":
+    provider: vllm
+    display_name: "Qwen2.5-32B-Instruct"
+    description: "Qwen 2.5 32B Instruct - Production local model"
+    context_window: 32768
+    max_output_tokens: 8192
+    supports_json_mode: true
+    supports_vision: false
+    vram_required_gb: 64
+    recommended_temperature:
+      translation: 0.3
+      review: 0.2
+      routing: 0.1
+    vllm_settings:
+      tensor_parallel_size: 1
+      gpu_memory_utilization: 0.9
+      max_model_len: 32768
+
+  "Qwen/Qwen2.5-72B-Instruct":
+    provider: vllm
+    display_name: "Qwen2.5-72B-Instruct"
+    description: "Qwen 2.5 72B Instruct - High-quality production model"
+    context_window: 32768
+    max_output_tokens: 8192
+    supports_json_mode: true
+    supports_vision: false
+    vram_required_gb: 144
+    recommended_temperature:
+      translation: 0.3
+      review: 0.2
+      routing: 0.1
+    vllm_settings:
+      tensor_parallel_size: 2
+      gpu_memory_utilization: 0.9
+      max_model_len: 32768
+
+# Translation Pipeline Configuration
+pipeline:
+  # Retry configuration
+  max_retries: 2
+  confidence_threshold: 0.75
+
+  # Agent-specific settings
+  agents:
+    router:
+      temperature: 0.1
+      max_tokens: 1024
+    translator:
+      temperature: 0.3
+      max_tokens: 8192
+    reviewer:
+      temperature: 0.2
+      max_tokens: 4096
+    post_processor:
+      temperature: 0.1
+      max_tokens: 8192
+
+# Language Configuration
+languages:
+  supported:
+    - code: en
+      name: English
+      rtl: false
+    - code: ar
+      name: Arabic (MSA)
+      rtl: true
+      variants:
+        - msa  # Modern Standard Arabic (default)
+        - gulf
+        - levantine
+        - egyptian
+    - code: fr
+      name: French
+      rtl: false
+    - code: de
+      name: German
+      rtl: false
+    - code: es
+      name: Spanish
+      rtl: false
+
+  default_source: auto
+  default_target: ar
+
+# Style Presets
+style_presets:
+  formal_msa:
+    name: "Formal MSA"
+    description: "Formal Modern Standard Arabic for official documents"
+    instructions: "Use formal Modern Standard Arabic. Maintain formal register, avoid colloquialisms."
+
+  neutral:
+    name: "Neutral"
+    description: "Balanced, professional tone"
+    instructions: "Use clear, professional language with balanced formality."
+
+  marketing:
+    name: "Marketing"
+    description: "Engaging, persuasive style for marketing content"
+    instructions: "Use engaging, persuasive language. Adapt idioms culturally. Maintain brand voice."
+
+  government_memo:
+    name: "Government Memo"
+    description: "Formal bureaucratic style for government documents"
+    instructions: "Use highly formal language appropriate for government correspondence. Follow official terminology."

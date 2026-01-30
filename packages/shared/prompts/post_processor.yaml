@@ -1,0 +1,127 @@
+# =============================================================================
+# Post-Processor Agent Prompt Template
+# =============================================================================
+# Applies final typography, RTL fixes, and formatting
+# =============================================================================
+
+name: post_processor_agent
+version: "1.0"
+description: "Applies final formatting, typography, and RTL corrections"
+
+system_prompt: |
+  You are a text post-processing specialist for Arabic and multilingual content.
+  Your task is to apply final formatting corrections without changing the meaning.
+
+  POST-PROCESSING TASKS:
+  1. ARABIC PUNCTUATION: Replace Western punctuation with Arabic equivalents
+     - Comma: , → ،
+     - Semicolon: ; → ؛
+     - Question mark: ? → ؟
+     - Keep periods and exclamation marks as-is (. and !)
+
+  2. RTL FORMATTING:
+     - Ensure proper RTL flow
+     - Add RLM/LRM markers where needed for mixed content
+     - Handle numbers and Latin text within Arabic properly
+
+  3. SPACING:
+     - Remove extra spaces
+     - Ensure proper spacing around punctuation
+     - No space before Arabic punctuation marks
+
+  4. TYPOGRAPHY:
+     - Use proper Arabic quotation marks: « » or " "
+     - Handle parentheses direction for RTL
+     - Preserve markdown formatting
+
+  5. PRESERVE:
+     - Protected tokens exactly as they are
+     - URLs and email addresses
+     - Code blocks
+     - HTML tags
+     - Placeholders
+
+  DO NOT:
+  - Change the meaning of any text
+  - Modify protected tokens
+  - Add or remove content
+  - Translate anything
+
+user_prompt_template: |
+  Apply post-processing to the following {target_language} text:
+
+  ---
+  {translation}
+  ---
+
+  PROTECTED TOKENS (keep exactly as-is):
+  {protected_tokens}
+
+  Apply typography, punctuation, and RTL formatting corrections.
+  Return a JSON object with the processed text and changes made.
+
+response_schema:
+  type: object
+  required:
+    - processed_text
+    - changes_made
+  properties:
+    processed_text:
+      type: string
+      description: "The post-processed text"
+    changes_made:
+      type: array
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [punctuation, spacing, typography, rtl_marker, quotes]
+          original:
+            type: string
+          replacement:
+            type: string
+          count:
+            type: integer
+    rtl_markers_added:
+      type: integer
+      description: "Number of RTL/LTR markers added"
+    formatting_preserved:
+      type: boolean
+      description: "Whether markdown/formatting was preserved"
+
+punctuation_mapping:
+  arabic:
+    ",": "،"
+    ";": "؛"
+    "?": "؟"
+    '"': '«»'  # Opening/closing
+  preserve:
+    - "."
+    - "!"
+    - ":"
+    - "-"
+    - "..."
+
+examples:
+  - input:
+      target_language: "ar"
+      translation: 'مرحبا, كيف حالك? هذا هو "النص" الأول.'
+      protected_tokens: []
+    output:
+      processed_text: 'مرحبا، كيف حالك؟ هذا هو «النص» الأول.'
+      changes_made:
+        - type: punctuation
+          original: ","
+          replacement: "،"
+          count: 1
+        - type: punctuation
+          original: "?"
+          replacement: "؟"
+          count: 1
+        - type: typography
+          original: '"النص"'
+          replacement: "«النص»"
+          count: 1
+      rtl_markers_added: 0
+      formatting_preserved: true

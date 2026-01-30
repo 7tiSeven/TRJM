@@ -1,0 +1,38 @@
+[
+  {
+    "id": "number_001",
+    "name": "Percentage preservation",
+    "category": "numbers",
+    "source": "The system achieved 99.5% uptime last month.",
+    "target_language": "ar",
+    "expected": "حقق النظام وقت تشغيل بنسبة 99.5% الشهر الماضي.",
+    "glossary": {}
+  },
+  {
+    "id": "number_002",
+    "name": "Multiple numbers",
+    "category": "numbers",
+    "source": "The project has 150 contributors and 2500 stars on GitHub.",
+    "target_language": "ar",
+    "expected": "يضم المشروع 150 مساهماً و2500 نجمة على GitHub.",
+    "glossary": {}
+  },
+  {
+    "id": "number_003",
+    "name": "Large numbers with units",
+    "category": "numbers",
+    "source": "The company processed 5.2M transactions worth $1.5B last year.",
+    "target_language": "ar",
+    "expected": "عالجت الشركة 5.2M معاملة بقيمة $1.5B العام الماضي.",
+    "glossary": {}
+  },
+  {
+    "id": "number_004",
+    "name": "Date preservation",
+    "category": "numbers",
+    "source": "The event is scheduled for 2024-03-15 at 14:00.",
+    "target_language": "ar",
+    "expected": "الحدث مجدول في 2024-03-15 الساعة 14:00.",
+    "glossary": {}
+  }
+]

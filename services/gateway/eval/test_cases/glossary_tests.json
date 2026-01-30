@@ -1,0 +1,38 @@
+[
+  {
+    "id": "glossary_001",
+    "name": "Single glossary term",
+    "category": "glossary",
+    "source": "The machine learning model achieved 95% accuracy.",
+    "target_language": "ar",
+    "expected": "حقق نموذج التعلم الآلي دقة 95%.",
+    "glossary": {
+      "machine learning": "التعلم الآلي"
+    }
+  },
+  {
+    "id": "glossary_002",
+    "name": "Multiple glossary terms",
+    "category": "glossary",
+    "source": "The artificial intelligence system uses machine learning and deep learning algorithms.",
+    "target_language": "ar",
+    "expected": "يستخدم نظام الذكاء الاصطناعي خوارزميات التعلم الآلي والتعلم العميق.",
+    "glossary": {
+      "artificial intelligence": "الذكاء الاصطناعي",
+      "machine learning": "التعلم الآلي",
+      "deep learning": "التعلم العميق"
+    }
+  },
+  {
+    "id": "glossary_003",
+    "name": "Technical term with context",
+    "category": "glossary",
+    "source": "The API endpoint returns a JSON response.",
+    "target_language": "ar",
+    "expected": "تُرجع نقطة نهاية الواجهة البرمجية استجابة JSON.",
+    "glossary": {
+      "API": "الواجهة البرمجية",
+      "endpoint": "نقطة نهاية"
+    }
+  }
+]

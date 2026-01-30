@@ -1,0 +1,271 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trjm.internal/schemas/qa_report.json",
+  "title": "QA Report Schema",
+  "description": "Detailed schema for translation quality assurance reports",
+  "type": "object",
+  "required": [
+    "report_id",
+    "job_id",
+    "timestamp",
+    "confidence_score",
+    "issues",
+    "metrics"
+  ],
+  "properties": {
+    "report_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "job_id": {
+      "type": "string",
+      "format": "uuid"
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "confidence_score": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Overall confidence in translation quality"
+    },
+    "confidence_level": {
+      "type": "string",
+      "enum": ["excellent", "good", "acceptable", "poor", "unacceptable"],
+      "description": "Human-readable confidence level"
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/Issue"
+      }
+    },
+    "metrics": {
+      "$ref": "#/definitions/Metrics"
+    },
+    "glossary_compliance": {
+      "$ref": "#/definitions/GlossaryCompliance"
+    },
+    "protected_tokens": {
+      "$ref": "#/definitions/ProtectedTokensStatus"
+    },
+    "risky_spans": {
+      "type": "array",
+      "items": {
+        "$ref": "#/definitions/RiskySpan"
+      }
+    },
+    "pipeline_metadata": {
+      "$ref": "#/definitions/PipelineMetadata"
+    }
+  },
+  "definitions": {
+    "Issue": {
+      "type": "object",
+      "required": ["id", "category", "severity", "description"],
+      "properties": {
+        "id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "category": {
+          "type": "string",
+          "enum": [
+            "meaning",
+            "omission",
+            "addition",
+            "numbers",
+            "entities",
+            "glossary",
+            "protected_tokens",
+            "grammar",
+            "punctuation",
+            "formatting",
+            "leftover_source",
+            "cultural"
+          ]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "major", "minor", "suggestion"]
+        },
+        "description": {
+          "type": "string"
+        },
+        "source_segment": {
+          "type": "string"
+        },
+        "translation_segment": {
+          "type": "string"
+        },
+        "corrected_segment": {
+          "type": "string"
+        },
+        "position": {
+          "type": "object",
+          "properties": {
+            "source": {
+              "type": "object",
+              "properties": {
+                "start": { "type": "integer" },
+                "end": { "type": "integer" }
+              }
+            },
+            "translation": {
+              "type": "object",
+              "properties": {
+                "start": { "type": "integer" },
+                "end": { "type": "integer" }
+              }
+            }
+          }
+        },
+        "auto_fixed": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "Metrics": {
+      "type": "object",
+      "properties": {
+        "total_issues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "critical_issues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "major_issues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "minor_issues": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "suggestions": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "source_char_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "translation_char_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "length_ratio": {
+          "type": "number",
+          "description": "Translation length / Source length"
+        }
+      }
+    },
+    "GlossaryCompliance": {
+      "type": "object",
+      "properties": {
+        "compliant": {
+          "type": "boolean"
+        },
+        "terms_expected": {
+          "type": "integer"
+        },
+        "terms_matched": {
+          "type": "integer"
+        },
+        "terms_missing": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "source": { "type": "string" },
+              "expected_target": { "type": "string" },
+              "actual_target": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "ProtectedTokensStatus": {
+      "type": "object",
+      "properties": {
+        "all_intact": {
+          "type": "boolean"
+        },
+        "total_tokens": {
+          "type": "integer"
+        },
+        "preserved_tokens": {
+          "type": "integer"
+        },
+        "modified_tokens": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "original": { "type": "string" },
+              "found": { "type": "string" }
+            }
+          }
+        }
+      }
+    },
+    "RiskySpan": {
+      "type": "object",
+      "required": ["text", "reason", "risk_level"],
+      "properties": {
+        "text": {
+          "type": "string"
+        },
+        "reason": {
+          "type": "string"
+        },
+        "risk_level": {
+          "type": "string",
+          "enum": ["low", "medium", "high"]
+        },
+        "position": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "integer" },
+            "end": { "type": "integer" }
+          }
+        },
+        "requires_human_review": {
+          "type": "boolean"
+        }
+      }
+    },
+    "PipelineMetadata": {
+      "type": "object",
+      "properties": {
+        "model_used": {
+          "type": "string"
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "total_tokens": {
+          "type": "integer"
+        },
+        "processing_time_ms": {
+          "type": "integer"
+        },
+        "agent_timings": {
+          "type": "object",
+          "properties": {
+            "router_ms": { "type": "integer" },
+            "translator_ms": { "type": "integer" },
+            "reviewer_ms": { "type": "integer" },
+            "post_processor_ms": { "type": "integer" }
+          }
+        }
+      }
+    }
+  }
+}

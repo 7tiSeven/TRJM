@@ -1,0 +1,29 @@
+[
+  {
+    "id": "rtl_001",
+    "name": "Basic Arabic translation",
+    "category": "rtl",
+    "source": "Welcome to our translation service.",
+    "target_language": "ar",
+    "expected": "مرحباً بكم في خدمة الترجمة الخاصة بنا.",
+    "glossary": {}
+  },
+  {
+    "id": "rtl_002",
+    "name": "Question with Arabic punctuation",
+    "category": "rtl",
+    "source": "How can I help you today?",
+    "target_language": "ar",
+    "expected": "كيف يمكنني مساعدتك اليوم؟",
+    "glossary": {}
+  },
+  {
+    "id": "rtl_003",
+    "name": "List with commas",
+    "category": "rtl",
+    "source": "We offer translation, editing, and proofreading services.",
+    "target_language": "ar",
+    "expected": "نقدم خدمات الترجمة والتحرير والتدقيق اللغوي.",
+    "glossary": {}
+  }
+]

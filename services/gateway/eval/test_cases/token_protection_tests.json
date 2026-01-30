@@ -1,0 +1,38 @@
+[
+  {
+    "id": "token_001",
+    "name": "URL preservation",
+    "category": "token_protection",
+    "source": "Visit our website at https://example.com/products for more information.",
+    "target_language": "ar",
+    "expected": "قم بزيارة موقعنا على https://example.com/products لمزيد من المعلومات.",
+    "glossary": {}
+  },
+  {
+    "id": "token_002",
+    "name": "Email preservation",
+    "category": "token_protection",
+    "source": "Contact us at support@company.com for assistance.",
+    "target_language": "ar",
+    "expected": "تواصل معنا على support@company.com للحصول على المساعدة.",
+    "glossary": {}
+  },
+  {
+    "id": "token_003",
+    "name": "Placeholder preservation",
+    "category": "token_protection",
+    "source": "Hello {{user_name}}, your order {{order_id}} has been shipped.",
+    "target_language": "ar",
+    "expected": "مرحباً {{user_name}}، تم شحن طلبك {{order_id}}.",
+    "glossary": {}
+  },
+  {
+    "id": "token_004",
+    "name": "Mixed tokens",
+    "category": "token_protection",
+    "source": "Dear {{customer_name}}, please visit https://portal.example.com or email help@example.com for your 50% discount.",
+    "target_language": "ar",
+    "expected": "عزيزي {{customer_name}}، يرجى زيارة https://portal.example.com أو إرسال بريد إلكتروني إلى help@example.com للحصول على خصم 50%.",
+    "glossary": {}
+  }
+]

@@ -1,0 +1,138 @@
+# =============================================================================
+# Router Agent Prompt Template
+# =============================================================================
+# Detects language, content type, and selects translation strategy
+# =============================================================================
+
+name: router_agent
+version: "1.0"
+description: "Analyzes input text to determine language, content type, and optimal translation strategy"
+
+system_prompt: |
+  You are a language analysis and routing agent for an enterprise translation system.
+  Your task is to analyze the input text and provide structured analysis.
+
+  You must respond with a valid JSON object containing:
+  1. source_language: The detected source language (ISO 639-1 code)
+  2. source_language_confidence: Confidence score 0.0-1.0
+  3. content_type: One of [general, email, legal, technical, marketing, ui_strings, government]
+  4. formality_level: One of [informal, neutral, formal, highly_formal]
+  5. special_elements: List of detected special elements that need protection
+  6. recommended_style: Recommended style preset for translation
+  7. complexity_score: Text complexity 0.0-1.0 (affects retry logic)
+  8. notes: Any special observations about the text
+
+  Special elements to detect:
+  - URLs (http/https links)
+  - Email addresses
+  - Placeholders ({variable}, {{variable}}, %s, etc.)
+  - Code blocks (inline or fenced)
+  - HTML tags
+  - Bracketed segments [DO NOT TRANSLATE]
+  - Numbers with units
+  - Dates and times
+  - Currency amounts
+  - Named entities (proper nouns, brand names)
+  - Technical terms
+
+  Be precise and consistent in your analysis.
+
+user_prompt_template: |
+  Analyze the following text for translation routing:
+
+  ---
+  {input_text}
+  ---
+
+  Target language: {target_language}
+  {style_hint}
+
+  Respond with a JSON object following the schema exactly.
+
+response_schema:
+  type: object
+  required:
+    - source_language
+    - source_language_confidence
+    - content_type
+    - formality_level
+    - special_elements
+    - recommended_style
+    - complexity_score
+  properties:
+    source_language:
+      type: string
+      description: "ISO 639-1 language code"
+    source_language_confidence:
+      type: number
+      minimum: 0
+      maximum: 1
+    content_type:
+      type: string
+      enum: [general, email, legal, technical, marketing, ui_strings, government]
+    formality_level:
+      type: string
+      enum: [informal, neutral, formal, highly_formal]
+    special_elements:
+      type: array
+      items:
+        type: object
+        properties:
+          type:
+            type: string
+            enum: [url, email, placeholder, code, html, bracketed, number, date, currency, entity, technical_term]
+          value:
+            type: string
+          position:
+            type: object
+            properties:
+              start:
+                type: integer
+              end:
+                type: integer
+          protect:
+            type: boolean
+    recommended_style:
+      type: string
+      enum: [formal_msa, neutral, marketing, government_memo]
+    complexity_score:
+      type: number
+      minimum: 0
+      maximum: 1
+    notes:
+      type: string
+
+examples:
+  - input: |
+      Dear Mr. Johnson,
+
+      Please find attached the Q3 report for review. The deadline for feedback is October 15, 2024.
+      Contact support@company.com for questions.
+
+      Best regards,
+      Sarah
+    output:
+      source_language: "en"
+      source_language_confidence: 0.99
+      content_type: "email"
+      formality_level: "formal"
+      special_elements:
+        - type: "date"
+          value: "October 15, 2024"
+          position: { start: 89, end: 105 }
+          protect: false
+        - type: "email"
+          value: "support@company.com"
+          position: { start: 128, end: 147 }
+          protect: true
+        - type: "entity"
+          value: "Mr. Johnson"
+          position: { start: 5, end: 16 }
+          protect: false
+        - type: "entity"
+          value: "Sarah"
+          position: { start: 175, end: 180 }
+          protect: false
+      recommended_style: "formal_msa"
+      complexity_score: 0.3
+      notes: "Business email with date reference and email address"

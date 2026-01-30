@@ -1,0 +1,178 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://trjm.internal/schemas/translation.json",
+  "title": "Translation Request and Response Schemas",
+  "description": "JSON schemas for TRJM translation API",
+  "definitions": {
+    "LanguageCode": {
+      "type": "string",
+      "enum": ["en", "ar", "fr", "de", "es", "auto"],
+      "description": "ISO 639-1 language code or 'auto' for detection"
+    },
+    "StylePreset": {
+      "type": "string",
+      "enum": ["formal_msa", "neutral", "marketing", "government_memo"],
+      "description": "Translation style preset"
+    },
+    "ContentType": {
+      "type": "string",
+      "enum": ["general", "email", "legal", "technical", "marketing", "ui_strings", "government"],
+      "description": "Detected content type"
+    },
+    "SpecialElement": {
+      "type": "object",
+      "required": ["type", "value", "protect"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["url", "email", "placeholder", "code", "html", "bracketed", "number", "date", "currency", "entity", "technical_term"]
+        },
+        "value": { "type": "string" },
+        "position": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "integer", "minimum": 0 },
+            "end": { "type": "integer", "minimum": 0 }
+          }
+        },
+        "protect": { "type": "boolean" }
+      }
+    },
+    "GlossaryEntry": {
+      "type": "object",
+      "required": ["source", "target"],
+      "properties": {
+        "source": { "type": "string", "minLength": 1 },
+        "target": { "type": "string", "minLength": 1 },
+        "case_sensitive": { "type": "boolean", "default": false },
+        "context": { "type": "string" }
+      }
+    },
+    "TranslationRequest": {
+      "type": "object",
+      "required": ["text"],
+      "properties": {
+        "text": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 100000,
+          "description": "Text to translate"
+        },
+        "source_language": {
+          "$ref": "#/definitions/LanguageCode",
+          "default": "auto"
+        },
+        "target_language": {
+          "$ref": "#/definitions/LanguageCode",
+          "default": "ar"
+        },
+        "style_preset": {
+          "$ref": "#/definitions/StylePreset",
+          "default": "neutral"
+        },
+        "glossary_id": {
+          "type": "string",
+          "format": "uuid",
+          "description": "Optional glossary to apply"
+        },
+        "protected_patterns": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Additional regex patterns to protect"
+        }
+      }
+    },
+    "TranslationResponse": {
+      "type": "object",
+      "required": ["job_id", "translation", "confidence", "qa_report"],
+      "properties": {
+        "job_id": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "translation": {
+          "type": "string",
+          "description": "Final translated text"
+        },
+        "source_language": {
+          "$ref": "#/definitions/LanguageCode"
+        },
+        "target_language": {
+          "$ref": "#/definitions/LanguageCode"
+        },
+        "confidence": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "description": "Overall confidence score"
+        },
+        "qa_report": {
+          "$ref": "#/definitions/QAReport"
+        },
+        "processing_time_ms": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "retries": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "QAReport": {
+      "type": "object",
+      "required": ["confidence_score", "issues", "glossary_compliance", "protected_tokens_intact"],
+      "properties": {
+        "confidence_score": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1
+        },
+        "issues": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/QAIssue" }
+        },
+        "glossary_compliance": { "type": "boolean" },
+        "protected_tokens_intact": { "type": "boolean" },
+        "risky_spans": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/RiskySpan" }
+        },
+        "reviewer_notes": { "type": "string" }
+      }
+    },
+    "QAIssue": {
+      "type": "object",
+      "required": ["category", "severity", "description"],
+      "properties": {
+        "category": {
+          "type": "string",
+          "enum": ["meaning", "omission", "addition", "numbers", "entities", "glossary", "protected_tokens", "grammar", "punctuation", "formatting", "leftover_source", "cultural"]
+        },
+        "severity": {
+          "type": "string",
+          "enum": ["critical", "major", "minor", "suggestion"]
+        },
+        "description": { "type": "string" },
+        "source_segment": { "type": "string" },
+        "translation_segment": { "type": "string" },
+        "suggested_fix": { "type": "string" }
+      }
+    },
+    "RiskySpan": {
+      "type": "object",
+      "required": ["text", "reason"],
+      "properties": {
+        "text": { "type": "string" },
+        "reason": { "type": "string" },
+        "position": {
+          "type": "object",
+          "properties": {
+            "start": { "type": "integer" },
+            "end": { "type": "integer" }
+          }
+        }
+      }
+    }
+  }
+}
